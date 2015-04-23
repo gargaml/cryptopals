@@ -22,13 +22,18 @@ sub int24_to_base64 {
 sub pad {
     my $hex = shift;
 
+    print "pad : $hex\n";
     my $length = length($hex) / 2;
-    my $padding_length = 3 - $length;
-    my $padded = $hex . ("\0" x $padding_length);
-    my @base64 = int24_to_base64(hex $padded);
-    splice(@base64, -1) if $length == 2;
-    splice(@base64, -2) if $length == 1;
-    @base64;
+    if ($length == 3) {
+	int24_to_base64(hex($hex));
+    } else {
+	my $padding_length = 3 - $length;
+	my $padded = hex($hex . ("00" x $padding_length));
+	my @base64 = int24_to_base64($padded);
+	my $base64_padding = $padding_length == 1 ? 1 : 2;
+	splice(@base64, - $base64_padding);
+	@base64, ((64) x $base64_padding);
+    }
 }
 
 sub to_base64 {
@@ -37,8 +42,8 @@ sub to_base64 {
     my @hex = unpack('(A6)*', $s);
     my $last = pop @hex;
     my @end = pad($last);
-    my @base64 = map { int24_to_base64 hex } @hex, @end;
-    map { $t[$_] } @base64;
+    my @base64 = map { int24_to_base64 hex } @hex;
+    map { $t[$_] } @base64, @end;
 }
 
 sub print_base64 {
