@@ -5,7 +5,6 @@ use strict;
 
 use Data::Printer;
 
-use Hex qw/to_base64 print_base64/;
+use Hex qw/to_base64 print_base64 xor/;
 
-my $encoded = print_base64("abab");
-p $encoded;
+xor('ababab', 'ababab');

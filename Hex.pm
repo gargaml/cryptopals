@@ -4,8 +4,9 @@ use warnings;
 use strict;
 
 use Exporter qw/import/;
+use List::MoreUtils qw/pairwise/;
 
-our @EXPORT_OK = qw/to_base64 print_base64/;
+our @EXPORT_OK = qw/to_base64 print_base64 xor/;
 
 my @t = ('A'..'Z','a'..'z','0'..'9','+','/', '=');
 
@@ -51,6 +52,16 @@ sub print_base64 {
     my @base64 = to_base64($content);
     my $s = join('', @base64);
     print "$s\n";
+}
+
+sub xor {
+    my ($a, $b) = @_;
+
+    my @a_bytes = unpack('(A2)*', $a);
+    my @b_bytes = unpack('(A2)*', $b);
+    my @result = pairwise { hex($a) ^ hex($b) } @a_bytes, @b_bytes;
+    my @r = map { sprintf "%02x", $_ } @result;
+    join '', @r;
 }
 
 1;
